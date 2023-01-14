@@ -1,0 +1,10 @@
+.recipient{
+   margin-left: 1%;
+   height: 97%;
+    width: 15%;
+    display: flex;
+    z-index: 2;
+    background: rgb(250,167,65);
+background: radial-gradient(circle, rgba(250,167,65,1) 0%, rgba(173,233,148,1) 100%);
+border-radius: 20px;
+}

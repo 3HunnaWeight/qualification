@@ -1,0 +1,15 @@
+.chat{
+    height: 97%;
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 2;
+    background: rgb(250,167,65);
+
+    box-sizing: border-box;
+    background: radial-gradient(circle, rgba(250,167,65,1) 0%, rgba(173,233,148,1) 100%);
+    border-radius: 20px;
+    margin-right: 1%;
+   
+}
