@@ -1,8 +1,11 @@
+
+import toolState from "../store/toolState"
 import Tool from "./Tool"
 export default class Brush extends Tool{
-    constructor(canvas){
-        super(canvas)
+    constructor(canvas,arc){
+        super(canvas,arc)
         this.listen()
+       
     }
 
     listen(){
@@ -20,12 +23,17 @@ export default class Brush extends Tool{
     }
     mouseMoveHandler(e){
         if(this.mouseDouwn){
-        this.draw(e.pageX - e.target.offsetLeft, e.pageY - e.target.offsetTop)
+        this.draw(e.pageX - e.target.offsetLeft, e.pageY - e.target.offsetTop,toolState.setWidthArc())
+        
         }
+        
     }
 
-    draw(x,y){
-        this.ctx.lineTo(x,y)
+    draw(x,y,arc){
+        this.ctx.lineTo(x,y)  
         this.ctx.stroke()
+        this.ctx.arc(x,y,arc,0,Math.PI*2) 
+        
     }
+  
 }
