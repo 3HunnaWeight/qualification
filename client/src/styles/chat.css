@@ -6,10 +6,39 @@
     justify-content: center;
     z-index: 2;
     background: rgb(250,167,65);
-
+    position: relative;
     box-sizing: border-box;
     background: radial-gradient(circle, rgba(250,167,65,1) 0%, rgba(173,233,148,1) 100%);
     border-radius: 20px;
     margin-right: 1%;
-   
+}
+.form{
+    display: flex;
+   position: absolute;
+   bottom:20px;
+    height: 3%;
+    left: 5px;
+    width: 100%;
+ 
+}
+.messages{
+    display: flex;
+    flex-direction: column;
+}
+.input{
+ width: 70%;
+ height: 100%;
+ border: none;
+ border-bottom:2px solid white ;
+ background:transparent;
+ outline: none;
+ 
+}
+
+.btnSend{
+background: url('../assets/img/send.png') no-repeat center center;
+   width:30%;
+   background-size:contain;
+ cursor: pointer;
+ 
 }
