@@ -1,6 +1,7 @@
 import { makeAutoObservable } from "mobx";
 
 class CanvasState{
+    canvas = null
     constructor(){
         makeAutoObservable(this)
     }
