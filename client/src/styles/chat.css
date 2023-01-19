@@ -19,14 +19,14 @@
     height: 3%;
     left: 5px;
     width: 100%;
- 
+
 }
 .messages{
-    display: flex;
-    flex-direction: column;
+    margin-left: 20%;
+    font-size: large;
 }
 .input{
- width: 70%;
+ width: 60%;
  height: 100%;
  border: none;
  border-bottom:2px solid white ;
@@ -42,3 +42,27 @@ background: url('../assets/img/send.png') no-repeat center center;
  cursor: pointer;
  
 }
+.buttonConnect{background-color: #f7aa45;
+    color:white;
+    border-radius: 20px;
+    border:none;
+    border-bottom:burlywood ;
+    cursor: pointer;
+    margin: auto;
+    height: 100%;
+    width: 30%;
+    }
+.containerMessages{
+    position: absolute;
+    
+    bottom: 60px;
+    border-bottom:1px solid white ;
+   height: 90%;
+     
+    width: 100%;
+    overflow-y: auto;
+box-sizing: border-box;
+}
+.containerMessages::-webkit-scrollbar {
+    display: none;
+  }
