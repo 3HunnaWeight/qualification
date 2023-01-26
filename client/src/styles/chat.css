@@ -66,3 +66,9 @@ box-sizing: border-box;
 .containerMessages::-webkit-scrollbar {
     display: none;
   }
+  .usernames{
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
