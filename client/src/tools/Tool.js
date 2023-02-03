@@ -1,7 +1,9 @@
 export default class Tool{
-    constructor(canvas){
+    constructor(canvas,socket,id){
         this.canvas= canvas
         this.ctx = canvas.getContext('2d')
+        this.id=id
+        this.socket=socket
         this.destroyEvents()
     }
 destroyEvents(){

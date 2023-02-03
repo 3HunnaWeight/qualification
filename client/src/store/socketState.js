@@ -1,22 +1,22 @@
-import { makeAutoObservable } from "mobx";
+import {runInAction, makeAutoObservable } from "mobx";
 
-class Socket{
+class Socket{ 
+    wait = true
     connection = false
-  socket = null
-  sessionid = null
   username=''
     constructor(){
         makeAutoObservable(this)
     }
-    setSocket(socket){
-        this.socket = socket
-    }
-    setSessionId(id) {
-        this.sessionid = id
-    }
     setConnection(connection){
  this.connection = connection
     }
+    setWait(wait){
+        runInAction(() => {
+            this.wait = wait
+          })
+    }
+   
+    
 }
 
 export default new Socket ()

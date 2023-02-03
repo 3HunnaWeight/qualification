@@ -1,11 +1,11 @@
 
+import canvasState from "../store/canvasState";
 import toolState from "../store/toolState"
 import Tool from "./Tool"
 export default class Brush extends Tool{
-    constructor(canvas,arc){
-        super(canvas,arc)
+    constructor(canvas, socket, id) {
+        super(canvas, socket, id);
         this.listen()
-       
     }
 
     listen(){
@@ -13,27 +13,33 @@ export default class Brush extends Tool{
         this.canvas.onmousedown = this.mouseDownHandler.bind(this)
         this.canvas.onmouseup = this.mouseUpHandler.bind(this)
     }
-    mouseUpHandler(e){
-        this.mouseDouwn = false
+    mouseUpHandler(e) {
+        this.mouseDown = false
+        this.socket.send(JSON.stringify({
+            event: 'draw',
+            idSession: this.id,
+            figure: {
+                type: 'finish',
+            }
+        }))
     }
-    mouseDownHandler(e){
-        this.mouseDouwn = true
+    mouseDownHandler(e) {
+        this.mouseDown = true
         this.ctx.beginPath()
         this.ctx.moveTo(e.pageX - e.target.offsetLeft, e.pageY - e.target.offsetTop)
     }
-    mouseMoveHandler(e){
-        if(this.mouseDouwn){
-        this.draw(e.pageX - e.target.offsetLeft, e.pageY - e.target.offsetTop,toolState.setWidthArc())
-        
+    mouseMoveHandler(e) {
+        if (this.mouseDown) {
+            // this.draw(e.pageX - e.target.offsetLeft, e.pageY - e.target.offsetTop)
+            canvasState.socket.send(JSON.stringify({
+                event: 'draw',
+                idSession: this.id,
+            }))
         }
-        
     }
 
-    draw(x,y,arc){
-        this.ctx.lineTo(x,y)  
-        this.ctx.stroke()
-        this.ctx.arc(x,y,arc,0,Math.PI*2) 
-        
+    static draw(ctx, x, y) {
+        ctx.lineTo(x, y)
+        ctx.stroke()
     }
-  
 }

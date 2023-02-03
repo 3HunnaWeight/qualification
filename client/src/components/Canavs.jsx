@@ -13,68 +13,117 @@ import playersState from '../store/playersState'
 export const Canavs =observer (() => {
   const [messages, setMessages] = useState([]);
   const [value, setValue] = useState('');
-  const [connectCounter,setConnectCounter] = useState(false)
+  const [words,setWords] = useState([])
   const [username, setUsername] = useState('')
+  const [show,setShow] = useState(false)
+  const [wordState,setWordState] = useState(false)
   const input = useRef()
   const params = useParams()
-  const socket = useRef()
-  const fn=()=>{
-    input.current.style.display = 'none';
-  }
+/*   const socket = useRef() */
   const canvasRef = useRef()
+  let word = playersState.words[getRandomInt(0,5)]
   function info(){
      const userinfo = {
       event: 'sendPlayers',
       username,
+      score:0,
       idSession: params.id,
       id:Date.now(),
     }
-    socket.current.send(JSON.stringify(userinfo))
-    socket.current.onmessage = (event) => {
+  
+    canvasState.socket.send(JSON.stringify(userinfo))
+    canvasState.socket.onmessage = (event) => {
+      playersState.setShow(true)
       const message = JSON.parse(event.data)
       setMessages(prev => [message, ...prev])
-     
-      
     } 
+    
    
+  }
+/* useEffect(()=>{
+  if(canvasState.socket!=null){
+    canvasState.socket.send=()=>{JSON.stringify(
+      {
+        test:"test"
+      }
+    )}
+    canvasState.socket.onmessage = (event) => {
+      let msg = JSON.parse(event.data)
+      switch (msg.method) {
+          case "draw":
+              drawHandler(msg)
+              break
+      }
+  }
+  }
+
+}) */
+/* playersState.setShow(false) */
+
+  const getWord = () =>{
+    const randWord ={
+      event:"word",
+      idSession: params.id,
+      someWord:word,
+      id:Date.now(),
+      toggle:"hide"
+    }
+
+  canvasState.socket.send(JSON.stringify(randWord))
+  canvasState.socket.onmessage = (event) => {
+      const wordFromServer = JSON.parse(event.data)
+      setMessages(prev => [wordFromServer, ...prev])
+      setWordState(true)
+    playersState.setToggle(true)
+    } 
+
+  }
+  messages.map(mess=>{if(mess.event==="word"){playersState.setShow(false)}})
+ 
+  
+
+console.log(words)
+console.log(messages)
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
   }
 //отследить количество пользователей если их 5 сделать рассылку на имен после чего добавить кнопку готов пока пользователей меньше 5 выводить идет подбор
   function connect() {
     socketState.setConnection(true)
-    socketState.setSessionId(params.id)
-    socket.current = new WebSocket('ws://localhost:5000')
-
-      socket.current.onopen = () => {
+    const socket = new WebSocket('ws://localhost:5000')
+    canvasState.setSessionId(params.id)
+    canvasState.setSocket(socket)
+    
+      socket.onopen = () => {
           const userinfo = {
             event: 'connection',
             username,
             idSession: params.id,
             id:Date.now(),
           }
-          socket.current.send(JSON.stringify(userinfo))
+          socket.send(JSON.stringify(userinfo))
        
       }
-
-      socket.current.onmessage = (event) => {
+   
+      socket.onmessage = (event) => {
         const message = JSON.parse(event.data)
         setMessages(prev => [message, ...prev])
-      
+        
       }
 
-      socket.current.onclose= () => {
+      socket.onclose= () => {
           console.log('Socket закрыт')
       }
 
-      socket.current.onerror = () => {
+      socket.onerror = () => {
           console.log('Socket произошла ошибка')
       }
+      
   }
-  
-
+ 
 
 useEffect(()=>{
   canvasState.setCanvas(canvasRef.current)
-  toolState.setTool(new Brush(canvasRef.current))
     },[])
 
   const sendMessage = async () => {
@@ -85,33 +134,37 @@ useEffect(()=>{
         event: 'message'
     }
 
-    socket.current.send(JSON.stringify(message));
+    canvasState.socket.send(JSON.stringify(message));
     setValue('')
 }
+
 
 return (
 <div style={{display:"contents"}}> 
   <div className='recipient' style={{marginTop:"1%"}}>
-
   <div className="usernames">
             {messages.map(mess =>
                              <div key={mess.id}>
                                  {mess.event === 'sendPlayers'
-                                     ? <div>{mess.username}</div>
+                                     ? <div>{mess.username} {mess.score}</div>
                                      : null
                                  }
                              </div>
                          )}
                      </div>
                      <div>
-                        {messages.length===3
+                        {messages.length==2
                      ?info()
                     
-                     :<div>wait</div>
+                     :null
                      }
                      </div>
-                     
-                  
+                    
+                     <div>{messages.length>=2
+                     ?null
+                     :<div>wait</div>
+                     }</div>
+               
   </div>
 <div className='canvas center'>
   <canvas ref={canvasRef} width={800} height={600}>
@@ -120,11 +173,16 @@ return (
   <Toolbar/>
 </div>
 
-
+<div key={Date.now()}>{playersState.show===true
+?<button style={{zIndex:"999",position:'absolute',left:Math.random()*800+'px',top:Math.random()*800+'px'}} onClick={()=>{getWord();}}>asdasd</button>
+:null
+}</div>
 
 <div className="chat" style={{marginTop:"1%"}}>
          {socketState.connection===false
          ?<div>
+           <div className='2'>2</div>
+  <div className='2'>3</div>
              <div className="center">
              <div className="form">
                  <input className='input'
@@ -141,19 +199,36 @@ return (
        
          :
         <div>
-          <div ref={input} className="form">
-                        <input ref={input} className='input' placeholder='Сообщение' value={value} onChange={e => setValue(e.target.value)} type="text"/>
-                       <div className='btnSend' onClick={()=>{sendMessage()}}></div>
-                   </div>
+          {messages.length>=3
+          ?<div ref={input} className="form">
+          <input ref={input} className='input' placeholder='Сообщение' value={value} onChange={e => setValue(e.target.value)} type="text"/>
+         <div className='btnSend' onClick={()=>{sendMessage()}}></div>
+     </div>
+          :null
+          }
+          <div>
+          {words.map(wrd =>
+                             <div key={Math.random()}>
+                                 {wordState===true
+                                     ? <div>
+                                     {wrd.someWord}
+                                 </div>
+                                     : null
+                                 }
+                             </div>
+                         )}
+          </div>
+        
+
                    <div className='containerMessages'>
                      <div className="messages">
                          {messages.map(mess =>
                              <div key={mess.id}>
-                                 {mess.event === 'connection'
-                                     ? null
-                                     : <div className="message">
-                                         {mess.username}. {mess.message}
-                                     </div>
+                                 {mess.event === 'message'
+                                     ? <div className="message" key={Date.now()}>
+                                          {mess.username}. {mess.message}
+                                 </div>
+                                     : null
                                  }
                              </div>
                          )}
