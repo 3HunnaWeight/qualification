@@ -15,8 +15,10 @@ export const Canavs =observer (() => {
   const [value, setValue] = useState('');
   const [words,setWords] = useState([])
   const [username, setUsername] = useState('')
-  const [show,setShow] = useState(false)
+  const [count,setCount] = useState(8)
   const [wordState,setWordState] = useState(false)
+  const [state,setState]=useState(3)
+  
   const input = useRef()
   const params = useParams()
 /*   const socket = useRef() */
@@ -40,47 +42,73 @@ export const Canavs =observer (() => {
     
    
   }
-/* useEffect(()=>{
-  if(canvasState.socket!=null){
-    canvasState.socket.send=()=>{JSON.stringify(
-      {
-        test:"test"
-      }
-    )}
-    canvasState.socket.onmessage = (event) => {
-      let msg = JSON.parse(event.data)
-      switch (msg.method) {
-          case "draw":
-              drawHandler(msg)
-              break
-      }
-  }
-  }
+  
 
-}) */
-/* playersState.setShow(false) */
 
+//отфильторвать мессаджес в новый массив и засетить его
+
+ const filter=()=>{
+  console.log(2)
+ const newMessages = messages.filter(item=>{
+  if(item.event!=="message"&&item.event!=="word"){
+    return true
+  }
+ 
+ })
+ setMessages(newMessages)
+ playersState.setShow(true)
+}
   const getWord = () =>{
-    const randWord ={
+ const randWord ={
       event:"word",
       idSession: params.id,
       someWord:word,
       id:Date.now(),
       toggle:"hide"
-    }
-
+    } 
+     
+//либо записывать в новый массив либо чистить мессадж
   canvasState.socket.send(JSON.stringify(randWord))
   canvasState.socket.onmessage = (event) => {
       const wordFromServer = JSON.parse(event.data)
       setMessages(prev => [wordFromServer, ...prev])
-      setWordState(true)
-    playersState.setToggle(true)
+      
+      
     } 
-
+    
+    
   }
   messages.map(mess=>{if(mess.event==="word"){playersState.setShow(false)}})
- 
+  useEffect(()=>{
+    messages.map(mess=>{if(mess.event==="word"){setWords([mess])}})
+  },[messages])
+  useEffect(()=>{
+    messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){setWords([])}})})
+  },[messages])
+ useEffect(()=>{
+  messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){filter()}})})
+ },)
+    
   
+  
+  useEffect(()=>{
+    messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){messages.map(user=>{if(mess.username==user.username){user.score++}})}})})
+  },[state,messages])
+     
+useEffect(()=>{
+  messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){messages.map(user=>{if(mess.username==user.username){setState(prev=>prev+1)&&setWords([])}})}})})
+},[messages])
+  
+
+useEffect(()=>{
+  if(words.length==0){
+    setWordState(false)
+  }
+},[words])
+     
+  
+
+//он сравнивает предидущее сообщение
 
 console.log(words)
 console.log(messages)
@@ -120,25 +148,26 @@ console.log(messages)
       }
       
   }
- 
+ console.log(wordState)
 
 useEffect(()=>{
   canvasState.setCanvas(canvasRef.current)
     },[])
 
-  const sendMessage = async () => {
+  const sendMessage = async (icv) => {
+    
     const message = {
         username,
-        message: value,
+        message: icv,
         idSession: params.id,
         event: 'message'
     }
 
     canvasState.socket.send(JSON.stringify(message));
-    setValue('')
+    input.current.value=''
 }
 
-
+console.log(value)
 return (
 <div style={{display:"contents"}}> 
   <div className='recipient' style={{marginTop:"1%"}}>
@@ -146,7 +175,9 @@ return (
             {messages.map(mess =>
                              <div key={mess.id}>
                                  {mess.event === 'sendPlayers'
-                                     ? <div>{mess.username} {mess.score}</div>
+                                     ? <div>{mess.username} {mess.score}
+                                      
+                                     </div>
                                      : null
                                  }
                              </div>
@@ -174,7 +205,7 @@ return (
 </div>
 
 <div key={Date.now()}>{playersState.show===true
-?<button style={{zIndex:"999",position:'absolute',left:Math.random()*800+'px',top:Math.random()*800+'px'}} onClick={()=>{getWord();}}>asdasd</button>
+?<button style={{zIndex:"999",position:'absolute',left:Math.random()*800+'px',top:Math.random()*800+'px'}} onClick={()=>{getWord();setWordState(true)}}>Получить слово</button>
 :null
 }</div>
 
@@ -186,8 +217,10 @@ return (
              <div className="center">
              <div className="form">
                  <input className='input'
-                     value={username}
-                     onChange={e => setUsername(e.target.value)}
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+
+                    
                      type="text"
                      placeholder="Введите ваше имя"/>
                  <button className='buttonConnect' onClick={()=>{connect();}}>Войти</button>
@@ -200,9 +233,9 @@ return (
          :
         <div>
           {messages.length>=3
-          ?<div ref={input} className="form">
-          <input ref={input} className='input' placeholder='Сообщение' value={value} onChange={e => setValue(e.target.value)} type="text"/>
-         <div className='btnSend' onClick={()=>{sendMessage()}}></div>
+          ?<div  className="form">
+          <input ref={input}   className='input' placeholder='Сообщение'  type="text"/>
+         <div className='btnSend' onClick={()=>{sendMessage(input.current.value);}}></div>
      </div>
           :null
           }
@@ -217,7 +250,7 @@ return (
                                  }
                              </div>
                          )}
-          </div>
+          </div> 
         
 
                    <div className='containerMessages'>
