@@ -19,3 +19,8 @@ flex-direction: row;
     justify-content: space-between;
     align-items: center;
 }
+.timer{
+    position: absolute;
+    top: 5%;
+    font-size: 3.5vh;
+}

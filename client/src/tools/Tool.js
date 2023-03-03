@@ -20,7 +20,5 @@ set strokeColor(color) {
 set lineWidth(width){
     this.ctx.lineWidth =width
 }
-set widthArc(arc){
-    this.arc=arc
-}
+
 }

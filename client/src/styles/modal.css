@@ -1,0 +1,88 @@
+.wait{
+    flex-direction: column;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 10000;
+   position: absolute;
+   top:20%;
+        width: 30%;
+        height: 20%;
+        background: radial-gradient(ellipse at top, rgba(250,167,65,1) 0%, rgba(173,233,148,1) 100%);
+        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    animation:scale 0.3s ;
+   z-index: 999;
+}
+.winner{
+    font-size: 4vh;
+    color: white;
+}
+.wrapperWord{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    font-size: 3vh;
+    
+}
+
+@keyframes scale {
+from{
+ transform: scale(0);
+}   
+to{
+transform: scale(1);
+} 
+}
+
+@keyframes unscale {
+    from{
+        transform: scale(1);
+    }
+    to{
+        transform: scale(0);
+    }
+    
+}
+.animation{
+    animation: unscale 0.3s ;
+}
+.hiddenWord{
+    color: white;
+font-size: 3vh;
+}
+.waitWrapper{
+    display: contents;
+}
+
+.endgameWrapper{
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    background-color: blanchedalmond;
+    z-index: 998;
+    background: rgb(250,167,65);
+    background: radial-gradient(circle, rgba(250,167,65,1) 0%, rgba(173,233,148,1) 100%);
+    display: flex;
+   
+}
+.winnerName{
+    position: absolute;
+    left: 0;
+    right: 0;
+    font-size: 8vh;
+    margin: auto;
+    color: white;
+    text-align: center;
+}
+.newGame{
+    margin-top: 20%;
+    width: 70%;
+    font-size: 8vw;
+    margin: auto;
+    color: white;
+    text-align: center;
+    border: 3px solid white;
+    border-radius: 50px;
+    align-items: center;
+}

@@ -1,13 +1,12 @@
 
-import { useState } from 'react';
+import { useState,useRef } from 'react';
 import './App.css';
+
 import { Canavs } from './components/Canavs';
-import { Chat } from './components/Chat';
-import { Recipient } from './components/Recipient';
 import { Toolbar } from './components/Toolbar';
 import {BrowserRouter, Route, Routes,Navigate} from "react-router-dom";
+import canvasState from './store/canvasState';
 function App() {
-  
   return (
     <BrowserRouter>
         <div className="App">
@@ -15,9 +14,8 @@ function App() {
             <Route path='/:id' element={<><Canavs/></>} />
             <Route path='/' element={<><Canavs/><Navigate to={`/f${(+new Date()).toString(16)}`} replace/></>} />
           </Routes>
-    </div>
+        </div>
     </BrowserRouter>
-
   );
 }
 
