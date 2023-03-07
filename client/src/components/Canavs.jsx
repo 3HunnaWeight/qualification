@@ -63,8 +63,6 @@ const modal = (name, word, value) => {
 }
 
 
-  
-
 function info(){
   setTimeout(()=>{
     setClose(true)
@@ -152,7 +150,7 @@ useEffect(()=>{
     clear()
   }
 },[playersState.timeIsOver])
-
+console.log(playersState.bonusScore)
 useEffect(()=>{
   messages.map(mess=>{
     words.map(word=>{
@@ -174,8 +172,6 @@ useEffect(()=>{
   })
 },[state,messages])
 
-
-
 const plus = ()=>{
   const plus ={
     event:"plus",
@@ -192,9 +188,6 @@ const getBonus = ()=>{
   }
   canvasState.socket.send(JSON.stringify(bonus))
 }
-
-
-
 
 useEffect(()=>{
   messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){messages.map(user=>{if(mess.uniqueName==user.uniqueName){setState(prev=>prev+1);setWords([]);setPaint(false);clear();playersState.setBonusScore(true);}})}})})
@@ -227,6 +220,7 @@ const drawHandler = (msg) => {
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
+
 const clear=()=>{
   const clearMsg ={
     event:"clear",
@@ -234,6 +228,7 @@ const clear=()=>{
   }
   canvasState.socket.send(JSON.stringify(clearMsg))
 }
+
 const fill=()=>{
   const fillMsg ={
     event:"fill",
@@ -286,7 +281,6 @@ const changeWidth=(width)=>{
   }
   canvasState.socket.send(JSON.stringify(widthMsg))
 } 
- console.log(messages)
 
  function closeConnections(){
   const closeConnections={
@@ -308,7 +302,6 @@ canvasState.socket.onmessage=(event)=>{
     case "clear":
       ctx = canvasState.canvas.getContext("2d")
       ctx.clearRect(0,0,800,600)
-      console.log("clear")
     break;
     case "fill":
       ctx = canvasState.canvas.getContext("2d")
@@ -334,14 +327,12 @@ canvasState.socket.onmessage=(event)=>{
     case "changeColor":
       toolState.setFillColor(msg.currentColor)
       toolState.setStrokeColor(msg.currentColor)
-      console.log(msg.color)
     break;
     case "changeWidth":
       toolState.setWidth(msg.currentWidth)
     break;
     case "end":
       playersState.setEnd(true)
-      console.log("end")
     break;
     case "plus":
      setUniquePlus([msg])
@@ -350,12 +341,10 @@ canvasState.socket.onmessage=(event)=>{
      },100)
     break;
     case "bonus":
-      console.log(213)
       setBonus([msg])
     break;
   }
 }
-console.log(bonus)
 
 useEffect(()=>{
   messages.map(user=>{

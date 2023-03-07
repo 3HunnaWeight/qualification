@@ -8,17 +8,11 @@ export const Timer = ({...props}) => {
     const minutes = getPadTime(Math.floor(time / 60))
     const sec = getPadTime(time-minutes*60)
     useEffect(()=>{
-     /*    {time<90 ?setState(false) :setState(true)}
-        playersState.setBonusScore(state) */
         if(time<90){
             playersState.setBonusScore(false)
-            console.log(playersState.bonusScore)
         }
     })
 
-   
-    
-    console.log(playersState.bonusScore)
     useEffect(()=>{
         const interval = setInterval(()=>{
             setTime((time)=>(time>-1?time -10 : 0))
