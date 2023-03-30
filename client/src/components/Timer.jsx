@@ -15,7 +15,7 @@ export const Timer = ({...props}) => {
 
     useEffect(()=>{
         const interval = setInterval(()=>{
-            setTime((time)=>(time>-1?time -10 : 0))
+            setTime((time)=>(time>-1?time -1 : 0))
         },1000)
         
     },[])
