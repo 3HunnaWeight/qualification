@@ -110,7 +110,7 @@ const getWord = () =>{
     setMessages(prev => [wordFromServer, ...prev])
   }  
 }
- 
+ console.log(playersState.show, playersState.modal,isConnnected,playersState.end)
 messages.map(mess=>{
   if(mess.event==="word"){
     playersState.setShow(false)
