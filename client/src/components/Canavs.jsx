@@ -239,7 +239,7 @@ const fill=()=>{
  console.log(1)
 function connect(icv) {
   socketState.setConnection(true)
-  const socket = new WebSocket('ws://45.130.43.31:8080')
+  const socket = new WebSocket('ws://localhost:5000')
   canvasState.setSessionId(params.id)
   canvasState.setSocket(socket)
   canvasState.setUsername(username)
@@ -407,7 +407,7 @@ const playersFn=(icv)=>{
   params.id+=icv
   let last = Number(params.id.slice(-1))
   setPlayers(last)
-  window.location.href=`http://45.130.43.31:8080/${params.id}`;
+  window.location.href=`http://localhost:3000/${params.id}`;
 }
 const setLobby = ()=>{
   if(params.id!=undefined){
