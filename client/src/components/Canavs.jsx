@@ -236,7 +236,7 @@ const fill=()=>{
   }
   canvasState.socket.send(JSON.stringify(fillMsg))
 }
- 
+ console.log(1)
 function connect(icv) {
   socketState.setConnection(true)
   const socket = new WebSocket('ws://45.130.43.31:5000')
