@@ -407,7 +407,7 @@ const playersFn=(icv)=>{
   params.id+=icv
   let last = Number(params.id.slice(-1))
   setPlayers(last)
-  window.location.href=`http://localhost:3000/${params.id}`;
+  window.location.href=`http://45.130.43.31:8080/${params.id}`;
 }
 const setLobby = ()=>{
   if(params.id!=undefined){
