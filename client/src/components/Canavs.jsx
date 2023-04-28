@@ -239,7 +239,7 @@ const fill=()=>{
  
 function connect(icv) {
   socketState.setConnection(true)
-  const socket = new WebSocket('ws://localhost:5000')
+  const socket = new WebSocket('ws://45.130.43.31:5000')
   canvasState.setSessionId(params.id)
   canvasState.setSocket(socket)
   canvasState.setUsername(username)
