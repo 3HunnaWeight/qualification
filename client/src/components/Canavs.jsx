@@ -531,7 +531,7 @@ return (
       <div className='links'>
         Пригласить друга:
           <div className='link'>
-            http://localhost:3000/{params.id}
+            http://45.130.43.31:8080/{params.id}
           </div>
       </div> 
       <div className="center">
