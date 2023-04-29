@@ -78,7 +78,6 @@ function info(){
   }
   canvasState.socket.send(JSON.stringify(userinfo))
   canvasState.socket.onmessage = (event) => {
-    playersState.setShow(true)
     const message = JSON.parse(event.data)
     setMessages(prev => [message, ...prev])
   } 
@@ -320,6 +319,7 @@ canvasState.socket.onmessage=(event)=>{
     case "sendPlayers":
       setMessages(prev => [msg, ...prev])
       setIsConnected(true)
+      playersState.setShow(true)
     break;
     case "word":
       setMessages(prev => [msg, ...prev])
