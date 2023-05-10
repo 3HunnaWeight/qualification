@@ -57,4 +57,4 @@ export default class Brush extends Tool {
         ctx.stroke()
     }
 }
-//когда выиграл перезагружать старинцу 
+

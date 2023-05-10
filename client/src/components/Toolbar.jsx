@@ -22,14 +22,14 @@ return (
         <input onChange={(e)=>{playersState.setCurrentColor(e.target.value);props.changeColor(playersState.color)}} type="color" style={{height:"40px", width:"80px"}}/>
         <div onClick={()=>{props.clear()}}>
           <MyButton>
-             Clear
+             Очистить
           </MyButton>
         </div>
       
         <input type="range" onChange={(e)=>{playersState.setWidth(e.target.value);props.changeWidth(playersState.width)}} defaultValue={15} min={0} max={50} className='weight'/>
         <div onClick={()=>{props.fill()}}>
           <MyButton>
-            fill
+            Завливка
           </MyButton>
         </div>
       </div>    

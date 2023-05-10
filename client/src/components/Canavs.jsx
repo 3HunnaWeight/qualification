@@ -15,6 +15,10 @@ import { Toolbar } from './Toolbar'
 import socketState from "../store/socketState"
 import playersState from '../store/playersState'
 import { Endgame } from './Endgame'
+import { PlayersBlock } from './PlayersBlock'
+import { GameChat } from './GameChat'
+import { gameLogicFunction } from '../gameLogic/gameLogicFunction'
+import { endGame,closeConnections, fill, getBonus, plus, getWord, changeColor, changeWidth, clear} from '../gameLogic/serverRequests'
 export const Canavs =observer (() => {
 const [bonus,setBonus] = useState([])
 const [messages, setMessages] = useState([]);
@@ -35,8 +39,8 @@ const params = useParams()
 const canvasRef = useRef()
 const playerStack = useRef()
 const connectInput = useRef()
-let word = playersState.words[getRandomInt(0,173)]
 
+let word = playersState.words[getRandomInt(0,173)]
  if(close){
   window.onbeforeunload = function() {
     return true;
@@ -62,30 +66,6 @@ const modal = (name, word, value) => {
   />)
 }
 
-
-function info(){
-  setTimeout(()=>{
-    setClose(true)
-    setChat(true)
-  },)
-  const userinfo = {
-    event:'sendPlayers',
-    uniqueName,
-    username,
-    score:0,
-    idSession: params.id,
-    id:Math.random().toString(16).slice(2),
-  }
-  canvasState.socket.send(JSON.stringify(userinfo))
-  canvasState.socket.onmessage = (event) => {
-    playersState.setShow(true)
-    const message = JSON.parse(event.data)
-    setMessages(prev => [message, ...prev])
-  } 
-  toolState.setTool(new Brush(canvasRef.current,canvasState.socket,params.id))
-  toolState.setWidth(15)
-}
-
  const filter=()=>{
   const newMessages = messages.filter(item=>{
     if(item.event!=="message"&&item.event!=="word"&&item.event!=="draw"&&item.event!=="clear"&&item!=="plus"){
@@ -96,20 +76,6 @@ function info(){
   playersState.setShow(true)
 }
 
-const getWord = () =>{
-  const randWord ={
-    event:"word",
-    idSession: params.id,
-    someWord:word,
-    id:Date.now(),
-  } 
-  canvasState.socket.send(JSON.stringify(randWord))
-  canvasState.socket.onmessage = (event) => {
-    setClose(true)
-    const wordFromServer = JSON.parse(event.data)
-    setMessages(prev => [wordFromServer, ...prev])
-  }  
-}
  console.log(playersState.show, playersState.modal,isConnnected,playersState.end)
 messages.map(mess=>{
   if(mess.event==="word"){
@@ -147,7 +113,7 @@ useEffect(()=>{
     filter();
     setWords([]);
     setPaint(false)
-    clear()
+    clearImport()
   }
 },[playersState.timeIsOver])
 console.log(playersState.bonusScore)
@@ -172,31 +138,36 @@ useEffect(()=>{
   })
 },[state,messages])
 
-const plus = ()=>{
-  const plus ={
-    event:"plus",
-    idSession:params.id,
-    plusName:uniqueName
-  }
-  canvasState.socket.send(JSON.stringify(plus))
-}
-const getBonus = ()=>{
-  const bonus ={
-    event:"bonus",
-    idSession:params.id,
-    name:uniqueName
-  }
-  canvasState.socket.send(JSON.stringify(bonus))
+const getBonusImport = ()=>{
+  return getBonus(params,uniqueName,canvasState)
 }
 
+const endGameImport = ()=>{
+ return endGame(params,canvasState)
+}
+
+const fillImport = ()=>{
+  return fill(params,canvasState)
+}
+
+const closeConnectionsImport = ()=>{
+  return closeConnections(params,canvasState)
+}
+
+const changeColorImport = (color)=>{
+  return changeColor(params,color,canvasState)
+}
+
+const changeWidthImport = (width)=>{
+  return changeWidth(params,width,canvasState)
+} 
+
+const clearImport = ()=>{
+  return clear(params,canvasState)
+} 
+
 useEffect(()=>{
-  messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){messages.map(user=>{if(mess.uniqueName==user.uniqueName){setState(prev=>prev+1);setWords([]);setPaint(false);clear();playersState.setBonusScore(true);}})}})})
-  messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){messages.map(user=>{if(mess.uniqueName==user.uniqueName){playersState.setWinner(mess.username)}})}})})
-  messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){messages.map(user=>{if(mess.uniqueName==user.uniqueName){playersState.setTimer(false)}})}})})
-  messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){messages.map(user=>{if(mess.uniqueName==user.uniqueName){playersState.setTimeIsOver(false)}})}})})
-  messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){messages.map(user=>{if(mess.uniqueName==user.uniqueName){playersState.setWinnerWord(word.someWord)}})}})})
-  messages.map(mess=>{words.map(word=>{if(mess.message===word.someWord){messages.map(user=>{if(mess.uniqueName==user.uniqueName&&paint){getBonus();}})}})}) 
-  messages.map(user=>{if(user.score>=20){endGame()}})
+  gameLogicFunction(messages,words,setState,setWords,setPaint,clearImport,playersState,getBonusImport,paint,endGameImport)
 },[messages])
 
 if(words.length===1){
@@ -221,22 +192,8 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-const clear=()=>{
-  const clearMsg ={
-    event:"clear",
-    idSession:params.id,
-  }
-  canvasState.socket.send(JSON.stringify(clearMsg))
-}
 
-const fill=()=>{
-  const fillMsg ={
-    event:"fill",
-    idSession:params.id,
-  }
-  canvasState.socket.send(JSON.stringify(fillMsg))
-}
- console.log(1)
+
 function connect(icv) {
   socketState.setConnection(true)
   const socket = new WebSocket('ws://localhost:5000')
@@ -264,31 +221,6 @@ function connect(icv) {
     console.log(event)
   }    
 }
-  
-const changeColor=(color)=>{
-  const colorMsg ={
-    event:"changeColor",
-    idSession:params.id,
-    currentColor:color
-  }
-  canvasState.socket.send(JSON.stringify(colorMsg))
-} 
-const changeWidth=(width)=>{
-  const widthMsg ={
-    event:"changeWidth",
-    idSession:params.id,
-    currentWidth:width
-  }
-  canvasState.socket.send(JSON.stringify(widthMsg))
-} 
-
- function closeConnections(){
-  const closeConnections={
-    event:"closeServ",
-    idSession:params.id
-  }
-  canvasState.socket.send(JSON.stringify(closeConnections))
-}
 
 if(canvasState.username) 
 canvasState.socket.onmessage=(event)=>{
@@ -296,7 +228,7 @@ canvasState.socket.onmessage=(event)=>{
   switch(msg.event){
     case "draw":
       drawHandler(msg) 
-      closeConnections()
+      closeConnectionsImport()
       
     break;
     case "clear":
@@ -312,7 +244,7 @@ canvasState.socket.onmessage=(event)=>{
     break;
     case "message":
       setMessages(prev => [msg, ...prev])
-      closeConnections()
+      closeConnectionsImport()
     break;
     case "connection":
       setMessages(prev => [msg, ...prev])
@@ -393,29 +325,19 @@ const sendMessage = async (icv) => {
   input.current.value=''
 }
 
-
-
-const endGame = () =>{
-  const endGame={
-    event:"end",
-    idSession:params.id,
-  }
-  canvasState.socket.send(JSON.stringify(endGame))
-}
-
 const playersFn=(icv)=>{
   params.id+=icv
   let last = Number(params.id.slice(-1))
   setPlayers(last)
   window.location.href=`http://localhost:3000/${params.id}`;
 }
+
 const setLobby = ()=>{
   if(params.id!=undefined){
     let last = Number(params.id.slice(-1))
     setPlayers(last)
   }
 }
-
 
 return (
 <div style={{display:"contents"}}>
@@ -450,31 +372,24 @@ return (
      </div>
     )}
   </div> 
-  <div className='recipient' style={{marginTop:"1%"}}>
-    <div className="usernames" >
-      {messages.map(mess =>
-        <div className='usernamesHolder' key={mess.id}>
-          {mess.event === 'sendPlayers'
-            ?
-            <div className='playerBlock'>
-              {mess.username} {mess.score}
-            </div>
-            :
-            null
-          }
-        </div>
-      )}
-    </div>
-    <div>
-      {
-        messages.length==players&&players>0&&close===false 
-          ?
-          info()                   
-          :
-          null
-      }
-    </div>
-  </div>
+
+  <PlayersBlock
+    messages={messages}
+    players={players}
+    close={close}
+    setClose={setClose}
+    setChat={setChat}
+    uniqueName={uniqueName}
+    username={username}
+    params={params}
+    canvasState={canvasState}
+    playersState={playersState}
+    setMessages={setMessages}
+    toolState={toolState}
+    canvasRef={canvasRef}
+    Brush={Brush}
+  />
+
   <div className='canvas center'>
     {chat===false 
       ?<div className='logo'>
@@ -491,10 +406,10 @@ return (
       height={600}>
     </canvas>
     <Toolbar
-    clear={clear}
-    fill={fill}
-    changeColor={changeColor}
-    changeWidth={changeWidth}
+      clear={clearImport}
+      fill={fillImport}
+      changeColor={changeColorImport}
+      changeWidth={changeWidthImport}
     />
   </div>
   {playersState.end===true
@@ -503,95 +418,36 @@ return (
     :
     null
   }
-    
-  <div className="chat" style={{marginTop:"1%"}}>
-    {params.id!=undefined&&params.id.length==12
-      ?
-      <div className='setPlayersWrapper'>
-        <div className='hint'>
-          Создать комнату
-        </div>
-        <div className='inputWrapper'>
-          <div>
-            Количесво игроков:
-          </div>
-          <input className='setPlayers' ref={playerStack}  type="number" max={8} min={2} />
-          <button className='set' onClick={()=>{playersFn(Number(playerStack.current.value));}}>
-            Создать
-          </button>
-        </div>
-      </div>
-      :
-      null
-    }
-
-  {socketState.connection===false&&params.id!=undefined&&params.id.length>12
-    ?
-    <div>
-      <div className='links'>
-        Пригласить друга:
-          <div className='link'>
-            http://45.130.43.31:8080/{params.id}
-          </div>
-      </div> 
-      <div className="center">
-        <div className="form">
-          <input ref={connectInput} className='input'
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            type="text"
-            placeholder="Введите ваше имя"/>
-          <button className='buttonConnect' onClick={()=>{if(connectInput.current.value.length>0){connect();}}}>
-            Войти
-          </button>
-        </div>
-      </div>           
-    </div>
-    :
-    <div>
-      {messages.length>=players+1&&paint===false&&words.length&&chat===true
-        ?
-        <div className="form">
-          <input ref={input} className='inputMsg' placeholder='Сообщение' type="text"/>
-          <div className='btnSend' onClick={()=>{if(input.current.value.length>0){closeConnections();sendMessage(input.current.value.charAt(0).toUpperCase() + input.current.value.slice(1))};}}></div>
-        </div>
-        :
-        null
-      }
-      <div className='containerMessages'>
-        <div className="messages">
-          {messages.map(mess =>
-            <div key={mess.id}>
-              {mess.event === 'message'
-                ?
-                <div className="message" key={Date.now()}>
-                  {mess.username}.
-                  {mess.message}
-                </div>
-                :
-                null
-              }
-            </div>
-          )}
-        </div>
-      </div>                            
-    </div>            
-  }                 
-  </div>
-
+  <GameChat
+    params={params}
+    playerStack={playerStack}
+    playersFn={playersFn}
+    connectInput={connectInput}
+    username={username}
+    setUsername={setUsername}
+    connect={connect}
+    players={players}
+    input={input}
+    messages={messages}
+    closeConnections={closeConnectionsImport}
+    sendMessage={sendMessage}
+    words={words}
+    chat={chat}
+    paint={paint}
+  />
   <div style={{position:"absolute",display:"contents"}} key={Date.now()}>{
     playersState.show===true&&playersState.modal===false&&isConnnected===true&&playersState.end===false
       ?
       <button style={{width:"auto",zIndex:"999",position:'absolute',left:Math.random()*800+'px',top:Math.random()*800+'px'}} onClick={()=>{
-        closeConnections()
-        getWord();
+        closeConnectionsImport()
+        getWord(params,word,canvasState,setClose,setMessages);
         setWordState(true);
         playersState.setTimer(true);
         setPaint(true)
-        plus()
+        plus(params,uniqueName,canvasState)
       }}>
           Получить слово
-      </button>//занести клик в массив с именем кликнувшего и сравнивать
+      </button>
       :
       null
   } 
