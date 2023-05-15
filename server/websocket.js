@@ -16,10 +16,10 @@ wss.on('connection', function connection(ws) {
                 broadcastMessage(message,ws)
             break;
             case 'word':
-                sendWord(message,ws)
+                broadcastMessage(message,ws)
             break;
             case 'draw':
-                sendWord(message,ws)
+                broadcastMessage(message,ws)
             break;
             case 'clear':
                 broadcastMessage(message,ws)

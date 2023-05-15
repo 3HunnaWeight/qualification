@@ -21,8 +21,6 @@ class ToolState{
     setWidth(width){
         this.tool.lineWidth = width
     }
-    setWidthArc(arc){
-        this.tool.widthArc=arc
 }
-}
+
 export default new ToolState()
